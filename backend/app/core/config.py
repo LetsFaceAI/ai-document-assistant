@@ -1,4 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pathlib import Path
+
+BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 
 class Settings(BaseSettings):
     # Define fields with their expected types and default values
@@ -6,10 +9,16 @@ class Settings(BaseSettings):
     port: int = 8000
     debug_mode: bool = False
     openrouter_api_key: str = "FakeKey123"
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openrouter_base_model: str = "Model"
+    environment: str ="dev"
 
     # Tell pydantic where to find the .env files
-    model_config = SettingsConfigDict(env_file=".env", 
-    env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+    env_file=BACKEND_DIR / ".env",
+    env_file_encoding="utf-8",
+    extra="ignore",
+)
 
 
 settings = Settings()

@@ -25,14 +25,12 @@ app.include_router(api_router,prefix="/api/v1")
 async def root():
     return {"message": "Welcome to the AI Document Assistant API"}
 
-@app.get("/env")
+@app.get("/info")
 async def get_env():
-    logger.info("Getting environment variables")
+    logger.info("Project Info")
     return {
         "app_name": settings.app_name,
-        "port": settings.port,
         "debug_mode": settings.debug_mode,
-        "openrouter_api_key": settings.openrouter_api_key
     }
 
 

@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from app.models import HealthResponse
+from app.core.config import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +11,7 @@ router = APIRouter()
 async def health_check():
     logger.info("Health check endpoint called")
     return HealthResponse(
-        status="123",
-        app_name="FastAPI-Backend",
-        environment="development"
+        status="HEALTHY",
+        app_name=settings.app_name,
+        environment=settings.environment
     )
