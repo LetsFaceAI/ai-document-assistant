@@ -3,8 +3,9 @@ import shutil
 import tempfile
 from app.core.config import settings
 from fastapi import UploadFile
+from app.services.pdf_service import PdfService
 from pathlib import Path
-from app.models.document import DocumentUploadResponse
+from app.models.document import DocumentUploadResponse, ExtractionSummary, PDFMetadataSchema
 from app.utils.file_utils import sanitize_filename, calculate_sha256
 
 logger = logging.getLogger(__name__)
@@ -22,6 +23,8 @@ class DocumentService:
         # Ensure storage directories exist at startup
         self.temp_dir.mkdir(parents=True, exist_ok=True)
         self.uploads_dir.mkdir(parents=True, exist_ok=True)
+
+        self.pdf_service = PdfService()
 
     async def process_pdf_upload(self, file: UploadFile) -> DocumentUploadResponse:
         # FIX 1: Catch None values immediately to prevent 500 errors
@@ -65,13 +68,25 @@ class DocumentService:
             shutil.move(str(temp_file_path), str(permanent_path))
             logger.info(f"Moved file to permanent storage: {permanent_path}")
 
+            # Extract PDF Content & Metadata
+            extraction_result = self.pdf_service.extract(permanent_path)
+
+            # Build Summary for Client Response (Omitting raw_text)
+            summary = ExtractionSummary(
+                page_count=extraction_result.page_count,
+                total_characters=extraction_result.total_characters,
+                metadata=PDFMetadataSchema(**extraction_result.metadata.model_dump()),
+            )
+
             return DocumentUploadResponse(
                 filename=target_filename,
                 original_filename=file.filename,
                 content_type=file.content_type,
                 size_bytes=total_bytes,
                 file_hash=file_hash,
-                storage_path=f"storage/uploads/{target_filename}"
+                storage_path=f"storage/uploads/{target_filename}",
+                message="File uploaded and extracted successfully.",
+                extraction_summary=summary,
             )
 
         except Exception as e:
