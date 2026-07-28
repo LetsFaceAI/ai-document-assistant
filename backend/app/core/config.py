@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 
 class Settings(BaseSettings):
@@ -12,6 +13,9 @@ class Settings(BaseSettings):
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_base_model: str = "Model"
     environment: str ="dev"
+    BASE_DIR: Path = PROJECT_ROOT
+    # Default to <PROJECT_ROOT>/storage if not set in .env
+    STORAGE_DIR: Path = PROJECT_ROOT / "storage"
 
     # Tell pydantic where to find the .env files
     model_config = SettingsConfigDict(
