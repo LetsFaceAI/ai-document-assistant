@@ -6,6 +6,7 @@ from fastapi import UploadFile
 from app.services.pdf_service import PdfService
 from pathlib import Path
 from app.models.document import DocumentUploadResponse, ExtractionSummary, PDFMetadataSchema
+from app.services.text_cleaning_service import TextCleaningService
 from app.utils.file_utils import sanitize_filename, calculate_sha256
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,7 @@ class DocumentService:
         self.uploads_dir.mkdir(parents=True, exist_ok=True)
 
         self.pdf_service = PdfService()
+        self.text_cleaning_service = TextCleaningService()
 
     async def process_pdf_upload(self, file: UploadFile) -> DocumentUploadResponse:
         # FIX 1: Catch None values immediately to prevent 500 errors
@@ -71,10 +73,14 @@ class DocumentService:
             # Extract PDF Content & Metadata
             extraction_result = self.pdf_service.extract(permanent_path)
 
+            # 5. Clean Extracted Text
+            cleaned_text = self.text_cleaning_service.clean_text(extraction_result.raw_text)
+
             # Build Summary for Client Response (Omitting raw_text)
             summary = ExtractionSummary(
                 page_count=extraction_result.page_count,
                 total_characters=extraction_result.total_characters,
+                cleaned_characters=len(cleaned_text),
                 metadata=PDFMetadataSchema(**extraction_result.metadata.model_dump()),
             )
 
@@ -89,9 +95,9 @@ class DocumentService:
                 extraction_summary=summary,
             )
 
-        except Exception as e:
-            # Clean up temp file if something failed before the move
+        finally:
             if temp_file_path and temp_file_path.exists():
-                temp_file_path.unlink()
-                logger.info(f"Cleaned up temporary file: {temp_file_path}")
-            raise e
+                try:
+                    temp_file_path.unlink()
+                except Exception as cleanup_err:
+                    logger.warning(f"Failed to remove temporary file '{temp_file_path}': {cleanup_err}")

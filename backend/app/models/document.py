@@ -14,6 +14,7 @@ class PDFMetadataSchema(BaseModel):
 class ExtractionSummary(BaseModel):
     page_count: int
     total_characters: int
+    cleaned_characters: int
     metadata: PDFMetadataSchema
 
 class DocumentUploadResponse(BaseModel):
