@@ -16,6 +16,9 @@ class ExtractionSummary(BaseModel):
     total_characters: int
     cleaned_characters: int
     metadata: PDFMetadataSchema
+    # Optional additions:
+    applied_rules_count: int | None = None
+    processing_time_ms: float | None = None
 
 class DocumentUploadResponse(BaseModel):
     filename: str = Field(..., description="Sanitized stored filename")

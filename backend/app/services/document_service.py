@@ -26,7 +26,7 @@ class DocumentService:
         self.uploads_dir.mkdir(parents=True, exist_ok=True)
 
         self.pdf_service = PdfService()
-        self.text_cleaning_service = TextCleaningService()
+        self.cleaner = TextCleaningService()
 
     async def process_pdf_upload(self, file: UploadFile) -> DocumentUploadResponse:
         # FIX 1: Catch None values immediately to prevent 500 errors
@@ -74,13 +74,32 @@ class DocumentService:
             extraction_result = self.pdf_service.extract(permanent_path)
 
             # 5. Clean Extracted Text
-            cleaned_text = self.text_cleaning_service.clean_text(extraction_result.raw_text)
+            cleaned_text = self.cleaner.clean_text(extraction_result.raw_text)
+
+            # --------------------------------------------------------------------
+            # --- DEBUG: Save raw vs. cleaned text files for manual inspection ---
+            debug_dir = self.storage_dir / "debug"
+            debug_dir.mkdir(parents=True, exist_ok=True)
+
+            raw_file_path = debug_dir / f"{hash_prefix}_RAW.txt"
+            cleaned_file_path = debug_dir / f"{hash_prefix}_CLEANED.txt"
+
+            raw_file_path.write_text(cleaned_text.original_text, encoding="utf-8")
+        
+            # FIX THE CRASH: Must access .cleaned_text property now
+            cleaned_file_path.write_text(cleaned_text.cleaned_text, encoding="utf-8")
+
+            logger.info(f"Saved debug text files to '{debug_dir}'")
+            logger.info(f"Cleaning stats: {cleaned_text.processing_time_ms}ms, applied {cleaned_text.applied_rules_count} rules")
+            # --------------------------------------------------------------------
 
             # Build Summary for Client Response (Omitting raw_text)
             summary = ExtractionSummary(
                 page_count=extraction_result.page_count,
                 total_characters=extraction_result.total_characters,
-                cleaned_characters=len(cleaned_text),
+                cleaned_characters=cleaned_text.cleaned_char_count,
+                applied_rules_count=cleaned_text.applied_rules_count,  
+                processing_time_ms=cleaned_text.processing_time_ms,
                 metadata=PDFMetadataSchema(**extraction_result.metadata.model_dump()),
             )
 

@@ -1,70 +1,149 @@
 import logging
 import re
+import time
 import unicodedata
+from typing import Callable, Dict, List
+
+from app.models.cleaning import TextCleaningResult
 
 logger = logging.getLogger(__name__)
 
 
 class TextCleaningService:
-    """Service dedicated to normalizing and cleaning raw extracted PDF text for downstream NLP/RAG tasks."""
+    """
+    A modular text cleaning pipeline designed to prepare raw PDF text for RAG embedding.
+    Preserves semantic meaning and paragraph boundaries while fixing extraction artifacts.
+    """
 
-    def clean_text(self, raw_text: str) -> str:
-        """
-        Runs raw text through a multi-stage cleaning pipeline:
-        1. Unicode Normalization (NFKC)
-        2. Line ending standardization
-        3. Control character removal
-        4. Tab & Non-breaking space normalization
-        5. Hyphenated word repair across line breaks
-        6. Mid-sentence artificial newline joining
-        7. Page number / standalone digit line stripping
-        8. Line-by-line trimming & space collapsing
-        9. Blank line normalization
-        """
+    def __init__(self, active_rules: List[str] | None = None):
+        # 1. Define all available modular rules mapping
+        self._available_rules: Dict[str, Callable[[str], str]] = {
+            "normalize_unicode": self._normalize_unicode,
+            "standardize_line_endings": self._standardize_line_endings,
+            "remove_control_characters": self._remove_control_characters,
+            "standardize_quotes_and_dashes": self._standardize_quotes_and_dashes,
+            "repair_broken_urls": self._repair_broken_urls,
+            "repair_hyphenation": self._repair_hyphenation,
+            "repair_mid_sentence_breaks": self._repair_mid_sentence_breaks,
+            "remove_page_numbers": self._remove_page_numbers,
+            "remove_noise_and_dividers": self._remove_noise_and_dividers,
+            "normalize_whitespace": self._normalize_whitespace,
+            "preserve_paragraphs": self._preserve_paragraphs,
+        }
+
+        # 2. Define the execution order. If none provided, use all default rules.
+        self.active_rules = active_rules or list(self._available_rules.keys())
+
+        # Validate provided rules
+        for rule in self.active_rules:
+            if rule not in self._available_rules:
+                raise ValueError(f"Unknown cleaning rule: '{rule}'")
+
+    def clean_text(self, raw_text: str) -> TextCleaningResult:
+        """Runs the raw text through the configured active rule pipeline."""
         if not raw_text:
-            logger.warning("Empty raw text provided for cleaning.")
-            return ""
+            return TextCleaningResult(
+                original_text="",
+                cleaned_text="",
+                original_char_count=0,
+                cleaned_char_count=0,
+                applied_rules_count=0,
+                processing_time_ms=0.0
+            )
 
-        original_char_count = len(raw_text)
-        logger.info(f"Cleaning Started | Original Characters: {original_char_count:,}")
+        start_time = time.perf_counter()
+        current_text = raw_text
 
-        # 1. Unicode Normalization (NFKC replaces ligatures like 'fi' -> 'fi', smart quotes, accented glyphs)
-        text = unicodedata.normalize("NFKC", raw_text)
+        # Execute active rules sequentially
+        for rule_name in self.active_rules:
+            rule_func = self._available_rules[rule_name]
+            current_text = rule_func(current_text)
 
-        # 2. Normalize Line Endings (CRLF / CR -> Unix LF)
-        text = text.replace("\r\n", "\n").replace("\r", "\n")
-
-        # 3. Strip Non-Printable Control Characters (Retains \n [0x0A] and \t [0x09])
-        text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", "", text)
-
-        # 4. Convert Non-Breaking Spaces and Tabs to Standard Spaces
-        text = text.replace("\xa0", " ").replace("\t", " ")
-
-        # 5. Fix Hyphenated Words Split Across Lines (e.g., 'environ-\n ment' -> 'environment')
-        text = re.sub(r"(\w+)-\s*\n\s*(\w+)", r"\1\2", text)
-
-        # 6. Join Mid-Sentence Artificial Line Breaks (lowercase/comma followed by newline & lowercase)
-        text = re.sub(r"(?<=[a-z,])\s*\n\s*(?=[a-z])", " ", text)
-
-        # 7. Remove Standalone Page Numbers and Boilerplate Lines (e.g., 'Page 12', '- 12 -', '12')
-        text = re.sub(r"(?m)^\s*(?:page|pg\.?)?\s*-?\s*\d+\s*-?\s*$\n?", "", text, flags=re.IGNORECASE)
-
-        # 8. Strip Leading and Trailing Whitespace from Every Line
-        lines = [line.strip() for line in text.split("\n")]
-        text = "\n".join(lines)
-
-        # 9. Collapse Multiple Consecutive Horizontal Spaces
-        text = re.sub(r"[ \t]{2,}", " ", text)
-
-        # 10. Collapse Excessive Empty Lines (Allows max 2 newlines = 1 blank line between paragraphs)
-        text = re.sub(r"\n{3,}", "\n\n", text)
-
-        cleaned_text = text.strip()
-        cleaned_char_count = len(cleaned_text)
+        end_time = time.perf_counter()
+        processing_time_ms = round((end_time - start_time) * 1000, 2)
 
         logger.info(
-            f"Cleaning Completed | Original Characters: {original_char_count:,}, "
-            f"Cleaned Characters: {cleaned_char_count:,}"
+            f"Cleaned Text: {len(raw_text):,} -> {len(current_text):,} chars | "
+            f"Rules: {len(self.active_rules)} | Time: {processing_time_ms}ms"
         )
 
-        return cleaned_text
+        return TextCleaningResult(
+            original_text=raw_text,
+            cleaned_text=current_text,
+            original_char_count=len(raw_text),
+            cleaned_char_count=len(current_text),
+            applied_rules_count=len(self.active_rules),
+            processing_time_ms=processing_time_ms
+        )
+
+    # ==========================================
+    # MODULAR CLEANING RULES (Isolated Logic)
+    # ==========================================
+
+    def _normalize_unicode(self, text: str) -> str:
+        """Normalizes Unicode characters (e.g., ligatures like 'fi' -> 'fi')."""
+        return unicodedata.normalize("NFKC", text)
+
+    def _standardize_line_endings(self, text: str) -> str:
+        """Converts Windows/Mac line endings to Unix standard."""
+        return text.replace("\r\n", "\n").replace("\r", "\n")
+
+    def _remove_control_characters(self, text: str) -> str:
+        """Strips non-printable control characters but keeps tabs and newlines."""
+        return re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", "", text)
+
+    def _standardize_quotes_and_dashes(self, text: str) -> str:
+        """Standardizes curly quotes to straight quotes, and various dashes to a simple hyphen."""
+        text = re.sub(r"[“”]", '"', text)
+        text = re.sub(r"[‘’]", "'", text)
+        return re.sub(r"[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]", "-", text)
+
+    def _repair_broken_urls(self, text: str) -> str:
+        """Rejoins URLs that were split across multiple lines."""
+        return re.sub(r"(https?://[a-zA-Z0-9./-]+)\s*\n\s*([a-zA-Z0-9./-]+)", r"\1\2", text)
+
+    def _repair_hyphenation(self, text: str) -> str:
+        """Rejoins words split by a hyphen at the end of a line (e.g., 'sys-\n tem' -> 'system')."""
+        return re.sub(r"(\w+)-\s*\n\s*(\w+)", r"\1\2", text)
+
+    def _repair_mid_sentence_breaks(self, text: str) -> str:
+        """
+        Removes single newlines that interrupt sentences. 
+        Looks for a lowercase letter or punctuation, a newline, and another lowercase letter.
+        """
+        return re.sub(r"(?<=[a-z,;:])\s*\n\s*(?=[a-z])", " ", text)
+
+    def _remove_page_numbers(self, text: str) -> str:
+        """Strips standalone lines containing only page numbers (e.g., 'Page 12' or '- 12 -')."""
+        return re.sub(r"(?m)^\s*(?:page|pg\.?)?\s*-?\s*\d+\s*-?\s*$\n?", "", text, flags=re.IGNORECASE)
+
+    def _remove_noise_and_dividers(self, text: str) -> str:
+        """Filters out lines containing only repeating symbols (e.g., '-------') or tiny isolated artifacts."""
+        lines = text.split("\n")
+        cleaned_lines = []
+        
+        for line in lines:
+            stripped = line.strip()
+            # Drop lines consisting purely of 4 or more repeating non-alphanumeric characters
+            if re.match(r"^([^a-zA-Z0-9])\1{3,}$", stripped):
+                continue
+            # Drop tiny 1-2 character lines that contain no letters or numbers (e.g., stray bullets)
+            if len(stripped) > 0 and len(stripped) < 3 and not re.search(r"[a-zA-Z0-9]", stripped):
+                continue
+            cleaned_lines.append(stripped)
+            
+        return "\n".join(cleaned_lines)
+
+    def _normalize_whitespace(self, text: str) -> str:
+        """Converts tabs/non-breaking spaces to standard spaces and collapses multiple horizontal spaces."""
+        text = text.replace("\xa0", " ").replace("\t", " ")
+        # Collapse 2+ horizontal spaces into 1, ignoring newlines
+        return re.sub(r"[ ]{2,}", " ", text)
+
+    def _preserve_paragraphs(self, text: str) -> str:
+        """
+        Ensures paragraphs are separated by exactly two newlines. 
+        Collapses 3+ newlines into 2, preventing the document from flattening into one paragraph.
+        """
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        return text.strip()
