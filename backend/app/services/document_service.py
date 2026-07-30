@@ -10,6 +10,7 @@ from app.models.document import DocumentUploadResponse, ExtractionSummary, PDFMe
 from app.services.text_cleaning_service import TextCleaningService
 from app.utils.file_utils import sanitize_filename, calculate_sha256
 from app.services.chunking_service import ChunkingService
+from app.models.domain import ProcessedDocument
 
 logger = logging.getLogger(__name__)
 
@@ -73,16 +74,36 @@ class DocumentService:
             shutil.move(str(temp_file_path), str(permanent_path))
             logger.info(f"Moved file to permanent storage: {permanent_path}")
 
-            # Extract PDF Content & Metadata
+            # 1. Extract PDF Content & Metadata
             extraction_result = self.pdf_service.extract(permanent_path)
 
-            # 5. Clean Extracted Text
+            # 2. Clean Extracted Text
             cleaning_result = self.cleaner.clean_text(extraction_result.raw_text)
 
-            chunks, chunk_summary = self.chunker.create_chunks(cleaning_result.cleaned_text)
+            # 3. Build Extraction Summary early for the domain model
+            summary = ExtractionSummary(
+                page_count=extraction_result.page_count,
+                total_characters=extraction_result.total_characters,
+                cleaned_characters=cleaning_result.cleaned_char_count,
+                applied_rules_count=cleaning_result.applied_rules_count,  
+                processing_time_ms=cleaning_result.processing_time_ms,
+                metadata=PDFMetadataSchema(**extraction_result.metadata.model_dump()),
+            )
+
+            # 4. STATE 1: Create ProcessedDocument
+            processed_doc = ProcessedDocument(
+                file_hash=file_hash,
+                metadata=summary.metadata,
+                raw_text=extraction_result.raw_text,
+                clean_text=cleaning_result.cleaned_text,
+                processing_stats=summary
+            )
+
+            # 5. STATE TRANSITION: ProcessedDocument -> ChunkedDocument
+            chunked_doc = self.chunker.process(processed_doc)
 
             # --------------------------------------------------------------------
-            # --- DEBUG: Save Raw vs. Cleaned vs. Chunks for visual inspection ---
+            # --- DEBUG: Save Raw vs. Cleaned vs. Chunks using Domain Models   ---
             # --------------------------------------------------------------------
             debug_dir = self.storage_dir / "debug"
             debug_dir.mkdir(parents=True, exist_ok=True)
@@ -91,17 +112,17 @@ class DocumentService:
 
             # 1. Save Raw Text
             raw_path = debug_dir / f"{hash_prefix}_1_RAW.txt"
-            raw_path.write_text(cleaning_result.original_text, encoding="utf-8")
+            raw_path.write_text(processed_doc.raw_text, encoding="utf-8")
 
             # 2. Save Cleaned Text
             cleaned_path = debug_dir / f"{hash_prefix}_2_CLEANED.txt"
-            cleaned_path.write_text(cleaning_result.cleaned_text, encoding="utf-8")
+            cleaned_path.write_text(processed_doc.clean_text, encoding="utf-8")
 
-            # 3. Save Human-Readable Chunks (Best for visual inspection)
+            # 3. Save Human-Readable Chunks
             chunks_txt_path = debug_dir / f"{hash_prefix}_3_CHUNKS.txt"
             
             readable_chunks = []
-            for c in chunks:
+            for c in chunked_doc.chunks:
                 header = (
                     f"=== CHUNK {c.chunk_index} "
                     f"| Length: {c.character_count} chars "
@@ -112,34 +133,25 @@ class DocumentService:
 
             chunks_txt_path.write_text("\n" + ("=" * 80) + "\n\n".join(readable_chunks), encoding="utf-8")
 
-            # 4. Save Raw JSON Chunks (Best for checking exact model output & metadata)
+            # 4. Save Raw JSON Chunks
             chunks_json_path = debug_dir / f"{hash_prefix}_3_CHUNKS.json"
-            chunks_data = [chunk.model_dump() for chunk in chunks]
+            chunks_data = [chunk.model_dump() for chunk in chunked_doc.chunks]
             chunks_json_path.write_text(json.dumps(chunks_data, indent=2), encoding="utf-8")
 
             logger.info(f"Saved debug files (RAW, CLEANED, CHUNKS) to '{debug_dir}'")
             # --------------------------------------------------------------------
 
-            # Build Summary for Client Response (Omitting raw_text)
-            summary = ExtractionSummary(
-                page_count=extraction_result.page_count,
-                total_characters=extraction_result.total_characters,
-                cleaned_characters=cleaning_result.cleaned_char_count,
-                applied_rules_count=cleaning_result.applied_rules_count,  
-                processing_time_ms=cleaning_result.processing_time_ms,
-                metadata=PDFMetadataSchema(**extraction_result.metadata.model_dump()),
-            )
-
+            # Return response using the final pipeline state
             return DocumentUploadResponse(
                 filename=target_filename,
                 original_filename=file.filename,
                 content_type=file.content_type,
                 size_bytes=total_bytes,
-                file_hash=file_hash,
+                file_hash=chunked_doc.file_hash,
                 storage_path=f"storage/uploads/{target_filename}",
-                message="File uploaded and extracted successfully.",
-                extraction_summary=summary,
-                chunking_summary=chunk_summary
+                message="File uploaded, extracted, cleaned, and chunked successfully.",
+                extraction_summary=chunked_doc.processing_stats,
+                chunking_summary=chunked_doc.chunking_stats
             )
 
         finally:

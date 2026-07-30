@@ -6,6 +6,7 @@ from typing import List, Tuple
 
 from app.core.config import settings
 from app.models.chunk import DocumentChunk, ChunkingSummary
+from app.models.domain import ProcessedDocument, ChunkedDocument
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,18 @@ class ChunkingService:
             r"\s+",              # Rule 3: Words
             ""                   # Rule 4: Characters
         ]
+
+    def process(self, document: ProcessedDocument) -> ChunkedDocument:
+        """Takes a ProcessedDocument and advances it to a ChunkedDocument."""
+        chunks, summary = self.create_chunks(document.clean_text)
+        
+        return ChunkedDocument(
+            file_hash=document.file_hash,
+            metadata=document.metadata,
+            chunks=chunks,
+            chunking_stats=summary,
+            processing_stats=document.processing_stats
+        )
 
     def _estimate_tokens(self, text: str) -> int:
         """Approximates token count (~4 chars per token)."""
