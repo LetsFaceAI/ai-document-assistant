@@ -11,6 +11,7 @@ from app.services.text_cleaning_service import TextCleaningService
 from app.utils.file_utils import sanitize_filename, calculate_sha256
 from app.services.chunking_service import ChunkingService
 from app.models.domain import ProcessedDocument
+from app.services.embedding_service import EmbeddingService
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,12 @@ class DocumentService:
         self.pdf_service = PdfService()
         self.cleaner = TextCleaningService()
         self.chunker = ChunkingService()  # Configured via settings
+
+        # 2. Instantiate EmbeddingService using settings
+        self.embedding_service = EmbeddingService(
+            model_name=settings.EMBEDDING_MODEL,
+            batch_size=settings.EMBEDDING_BATCH_SIZE
+        )
 
     async def process_pdf_upload(self, file: UploadFile) -> DocumentUploadResponse:
         # FIX 1: Catch None values immediately to prevent 500 errors
@@ -102,6 +109,9 @@ class DocumentService:
             # 5. STATE TRANSITION: ProcessedDocument -> ChunkedDocument
             chunked_doc = self.chunker.process(processed_doc)
 
+            # 6. STATE TRANSITION 2: ChunkedDocument -> EmbeddedDocument (NEW!)
+            embedded_doc = self.embedding_service.process(chunked_doc)
+
             # --------------------------------------------------------------------
             # --- DEBUG: Save Raw vs. Cleaned vs. Chunks using Domain Models   ---
             # --------------------------------------------------------------------
@@ -139,6 +149,11 @@ class DocumentService:
             chunks_json_path.write_text(json.dumps(chunks_data, indent=2), encoding="utf-8")
 
             logger.info(f"Saved debug files (RAW, CLEANED, CHUNKS) to '{debug_dir}'")
+
+            # Save Embeddings Metadata & Vectors for inspection
+            embeddings_json_path = debug_dir / f"{hash_prefix}_4_EMBEDDINGS.json"
+            embeddings_data = [chunk.model_dump() for chunk in embedded_doc.chunks]
+            embeddings_json_path.write_text(json.dumps(embeddings_data, indent=2), encoding="utf-8")
             # --------------------------------------------------------------------
 
             # Return response using the final pipeline state

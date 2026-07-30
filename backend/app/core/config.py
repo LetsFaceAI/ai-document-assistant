@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     CHUNK_OVERLAP: int = 50
     MIN_CHUNK_SIZE: int = 50
 
+    EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
+    EMBEDDING_BATCH_SIZE: int = 32
+
     # Tell pydantic where to find the .env files
     model_config = SettingsConfigDict(
     env_file=BACKEND_DIR / ".env",

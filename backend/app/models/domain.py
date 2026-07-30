@@ -22,9 +22,26 @@ class ChunkedDocument(BaseModel):
     # Optional: Keep previous stats if needed for the final API response
     processing_stats: ExtractionSummary 
 
-# 3. Future State: After Embedding (Preview)
+class EmbeddedChunk(BaseModel):
+    chunk_id: str
+    text: str
+    embedding: List[float]
+    dimension: int
+    model_name: str
+
+class EmbeddingSummary(BaseModel):
+    model_name: str
+    dimension: int
+    total_chunks: int
+    processing_time_ms: float
+
 class EmbeddedDocument(BaseModel):
     file_hash: str
     metadata: PDFMetadataSchema
-    chunks: List[DocumentChunk]  # Ideally updated with embedding vectors
-    # embedding_stats: EmbeddingSummary
+    chunks: List[EmbeddedChunk]
+    embedding_stats: EmbeddingSummary
+    
+    # Carry forward previous stats
+    chunking_stats: ChunkingSummary
+    processing_stats: ExtractionSummary
+
