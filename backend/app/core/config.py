@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # Default to <PROJECT_ROOT>/storage if not set in .env
     STORAGE_DIR: Path = PROJECT_ROOT / "storage"
 
+    # Chunking Configuration
+    CHUNK_SIZE: int = 500
+    CHUNK_OVERLAP: int = 50
+    MIN_CHUNK_SIZE: int = 50
+
     # Tell pydantic where to find the .env files
     model_config = SettingsConfigDict(
     env_file=BACKEND_DIR / ".env",

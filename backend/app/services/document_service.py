@@ -1,6 +1,7 @@
 import logging
 import shutil
 import tempfile
+import json
 from app.core.config import settings
 from fastapi import UploadFile
 from app.services.pdf_service import PdfService
@@ -8,6 +9,7 @@ from pathlib import Path
 from app.models.document import DocumentUploadResponse, ExtractionSummary, PDFMetadataSchema
 from app.services.text_cleaning_service import TextCleaningService
 from app.utils.file_utils import sanitize_filename, calculate_sha256
+from app.services.chunking_service import ChunkingService
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,7 @@ class DocumentService:
 
         self.pdf_service = PdfService()
         self.cleaner = TextCleaningService()
+        self.chunker = ChunkingService()  # Configured via settings
 
     async def process_pdf_upload(self, file: UploadFile) -> DocumentUploadResponse:
         # FIX 1: Catch None values immediately to prevent 500 errors
@@ -74,32 +77,56 @@ class DocumentService:
             extraction_result = self.pdf_service.extract(permanent_path)
 
             # 5. Clean Extracted Text
-            cleaned_text = self.cleaner.clean_text(extraction_result.raw_text)
+            cleaning_result = self.cleaner.clean_text(extraction_result.raw_text)
+
+            chunks, chunk_summary = self.chunker.create_chunks(cleaning_result.cleaned_text)
 
             # --------------------------------------------------------------------
-            # --- DEBUG: Save raw vs. cleaned text files for manual inspection ---
+            # --- DEBUG: Save Raw vs. Cleaned vs. Chunks for visual inspection ---
+            # --------------------------------------------------------------------
             debug_dir = self.storage_dir / "debug"
             debug_dir.mkdir(parents=True, exist_ok=True)
 
-            raw_file_path = debug_dir / f"{hash_prefix}_RAW.txt"
-            cleaned_file_path = debug_dir / f"{hash_prefix}_CLEANED.txt"
+            hash_prefix = file_hash[:10] if 'file_hash' in locals() else "debug_doc"
 
-            raw_file_path.write_text(cleaned_text.original_text, encoding="utf-8")
-        
-            # FIX THE CRASH: Must access .cleaned_text property now
-            cleaned_file_path.write_text(cleaned_text.cleaned_text, encoding="utf-8")
+            # 1. Save Raw Text
+            raw_path = debug_dir / f"{hash_prefix}_1_RAW.txt"
+            raw_path.write_text(cleaning_result.original_text, encoding="utf-8")
 
-            logger.info(f"Saved debug text files to '{debug_dir}'")
-            logger.info(f"Cleaning stats: {cleaned_text.processing_time_ms}ms, applied {cleaned_text.applied_rules_count} rules")
+            # 2. Save Cleaned Text
+            cleaned_path = debug_dir / f"{hash_prefix}_2_CLEANED.txt"
+            cleaned_path.write_text(cleaning_result.cleaned_text, encoding="utf-8")
+
+            # 3. Save Human-Readable Chunks (Best for visual inspection)
+            chunks_txt_path = debug_dir / f"{hash_prefix}_3_CHUNKS.txt"
+            
+            readable_chunks = []
+            for c in chunks:
+                header = (
+                    f"=== CHUNK {c.chunk_index} "
+                    f"| Length: {c.character_count} chars "
+                    f"| Est. Tokens: ~{c.estimated_token_count} "
+                    f"| Offsets: [{c.start_offset}:{c.end_offset}] ==="
+                )
+                readable_chunks.append(f"{header}\n{c.text}\n")
+
+            chunks_txt_path.write_text("\n" + ("=" * 80) + "\n\n".join(readable_chunks), encoding="utf-8")
+
+            # 4. Save Raw JSON Chunks (Best for checking exact model output & metadata)
+            chunks_json_path = debug_dir / f"{hash_prefix}_3_CHUNKS.json"
+            chunks_data = [chunk.model_dump() for chunk in chunks]
+            chunks_json_path.write_text(json.dumps(chunks_data, indent=2), encoding="utf-8")
+
+            logger.info(f"Saved debug files (RAW, CLEANED, CHUNKS) to '{debug_dir}'")
             # --------------------------------------------------------------------
 
             # Build Summary for Client Response (Omitting raw_text)
             summary = ExtractionSummary(
                 page_count=extraction_result.page_count,
                 total_characters=extraction_result.total_characters,
-                cleaned_characters=cleaned_text.cleaned_char_count,
-                applied_rules_count=cleaned_text.applied_rules_count,  
-                processing_time_ms=cleaned_text.processing_time_ms,
+                cleaned_characters=cleaning_result.cleaned_char_count,
+                applied_rules_count=cleaning_result.applied_rules_count,  
+                processing_time_ms=cleaning_result.processing_time_ms,
                 metadata=PDFMetadataSchema(**extraction_result.metadata.model_dump()),
             )
 
@@ -112,6 +139,7 @@ class DocumentService:
                 storage_path=f"storage/uploads/{target_filename}",
                 message="File uploaded and extracted successfully.",
                 extraction_summary=summary,
+                chunking_summary=chunk_summary
             )
 
         finally:

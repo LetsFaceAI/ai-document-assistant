@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from app.models.chunk import ChunkingSummary
 
 class PDFMetadataSchema(BaseModel):
     title: str | None = None
@@ -29,3 +30,4 @@ class DocumentUploadResponse(BaseModel):
     storage_path: str = Field(..., description="Path relative to storage directory")
     message: str = Field(default="File uploaded and validated successfully.")
     extraction_summary: ExtractionSummary
+    chunking_summary: ChunkingSummary
