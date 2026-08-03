@@ -12,6 +12,7 @@ from app.utils.file_utils import sanitize_filename, calculate_sha256
 from app.services.chunking_service import ChunkingService
 from app.models.domain import ProcessedDocument
 from app.services.embedding_service import EmbeddingService
+from app.services.vector_store_service import VectorStore, ChromaVectorStore
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,12 @@ class DocumentService:
         self.embedding_service = EmbeddingService(
             model_name=settings.EMBEDDING_MODEL,
             batch_size=settings.EMBEDDING_BATCH_SIZE
+        )
+
+        # Inject the concrete implementation behind the Protocol
+        self.vector_store: VectorStore = ChromaVectorStore(
+            persist_directory=settings.VECTOR_DB_PATH,
+            collection_name=settings.VECTOR_COLLECTION
         )
 
     async def process_pdf_upload(self, file: UploadFile) -> DocumentUploadResponse:
@@ -106,11 +113,14 @@ class DocumentService:
                 processing_stats=summary
             )
 
-            # 5. STATE TRANSITION: ProcessedDocument -> ChunkedDocument
+            # 5. STATE TRANSITION 1: ProcessedDocument -> ChunkedDocument
             chunked_doc = self.chunker.process(processed_doc)
 
             # 6. STATE TRANSITION 2: ChunkedDocument -> EmbeddedDocument (NEW!)
             embedded_doc = self.embedding_service.process(chunked_doc)
+
+            # STATE TRANSITION 3: EmbeddedDocument -> VectorizedDocument
+            vectorized_doc = self.vector_store.store(embedded_doc)
 
             # --------------------------------------------------------------------
             # --- DEBUG: Save Raw vs. Cleaned vs. Chunks using Domain Models   ---
@@ -154,6 +164,13 @@ class DocumentService:
             embeddings_json_path = debug_dir / f"{hash_prefix}_4_EMBEDDINGS.json"
             embeddings_data = [chunk.model_dump() for chunk in embedded_doc.chunks]
             embeddings_json_path.write_text(json.dumps(embeddings_data, indent=2), encoding="utf-8")
+
+            # NEW: Save Vectorized Document Summary
+            vectorized_json_path = debug_dir / f"{hash_prefix}_5_VECTORIZED.json"
+            vectorized_json_path.write_text(
+                vectorized_doc.model_dump_json(indent=2), 
+                encoding="utf-8"
+            )
             # --------------------------------------------------------------------
 
             # Return response using the final pipeline state

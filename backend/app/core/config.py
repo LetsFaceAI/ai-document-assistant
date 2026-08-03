@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_BATCH_SIZE: int = 32
 
+    VECTOR_DB_PROVIDER: str = "chromadb"
+    VECTOR_DB_PATH: str = "storage/chromadb"
+    VECTOR_COLLECTION: str = "documents"
+
     # Tell pydantic where to find the .env files
     model_config = SettingsConfigDict(
     env_file=BACKEND_DIR / ".env",

@@ -45,3 +45,14 @@ class EmbeddedDocument(BaseModel):
     chunking_stats: ChunkingSummary
     processing_stats: ExtractionSummary
 
+class StorageSummary(BaseModel):
+    provider: str
+    collection_name: str
+    total_chunks_stored: int
+    persisted: bool
+
+class VectorizedDocument(BaseModel):
+    document_id: str
+    collection_name: str
+    stored_chunks: int
+    storage_summary: StorageSummary
