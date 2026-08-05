@@ -94,6 +94,10 @@ class DocumentService:
             # 2. Clean Extracted Text
             cleaning_result = self.cleaner.clean_text(extraction_result.raw_text)
 
+            # Dump metadata to dict and explicitly set the filename
+            metadata_dict = extraction_result.metadata.model_dump()
+            metadata_dict["filename"] = clean_filename
+
             # 3. Build Extraction Summary early for the domain model
             summary = ExtractionSummary(
                 page_count=extraction_result.page_count,
@@ -101,7 +105,7 @@ class DocumentService:
                 cleaned_characters=cleaning_result.cleaned_char_count,
                 applied_rules_count=cleaning_result.applied_rules_count,  
                 processing_time_ms=cleaning_result.processing_time_ms,
-                metadata=PDFMetadataSchema(**extraction_result.metadata.model_dump()),
+                metadata=PDFMetadataSchema(**metadata_dict),
             )
 
             # 4. STATE 1: Create ProcessedDocument

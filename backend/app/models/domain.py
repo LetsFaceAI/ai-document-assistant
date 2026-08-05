@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, Field
+from typing import Any, Dict, List, Optional
 from app.models.chunk import DocumentChunk, ChunkingSummary
 from app.models.document import PDFMetadataSchema, ExtractionSummary
 
@@ -56,3 +56,22 @@ class VectorizedDocument(BaseModel):
     collection_name: str
     stored_chunks: int
     storage_summary: StorageSummary
+
+class RetrievedChunk(BaseModel):
+    chunk_id: str
+    text: str
+    score: float
+    document_id: str
+    filename: str
+    page_number: Optional[int] = None
+    chunk_index: int
+    metadata: Dict[str, Any]
+    # Store the vector for UMAP visualization
+    embedding: Optional[List[float]] = Field(default=None, exclude=True)
+
+class RetrievalResult(BaseModel):
+    question: str
+    top_k: int
+    retrieved_chunks: List[RetrievedChunk]
+    retrieval_time_ms: float
+    embedding_model: str

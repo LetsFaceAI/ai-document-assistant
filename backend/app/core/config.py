@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     VECTOR_DB_PATH: str = "storage/chromadb"
     VECTOR_COLLECTION: str = "documents"
 
+    # Retrieval Settings
+    RETRIEVAL_TOP_K: int = 10
+    MIN_SIMILARITY_SCORE: float = 0.50
+
     # Tell pydantic where to find the .env files
     model_config = SettingsConfigDict(
     env_file=BACKEND_DIR / ".env",

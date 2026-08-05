@@ -1,6 +1,8 @@
 import time
 import logging
+from typing import List
 from sentence_transformers import SentenceTransformer
+from app.core.config import settings
 from app.models.domain import ChunkedDocument, EmbeddedDocument, EmbeddedChunk, EmbeddingSummary
 
 logger = logging.getLogger(__name__)
@@ -10,7 +12,9 @@ class EmbeddingService:
     # This ensures we don't reload the 130MB model on every API request
     _model_instance = None 
 
-    def __init__(self, model_name: str, batch_size: int):
+    def __init__(self, 
+        model_name: str = settings.EMBEDDING_MODEL,
+        batch_size: int = settings.EMBEDDING_BATCH_SIZE):
         self.model_name = model_name
         self.batch_size = batch_size
         
@@ -90,3 +94,25 @@ class EmbeddingService:
             chunking_stats=document.chunking_stats,
             processing_stats=document.processing_stats
         )
+
+    def embed_query(self, question: str) -> List[float]:
+            """
+            Embeds a single user question for vector search.
+            """
+            if not question or not question.strip():
+                raise ValueError("Query cannot be empty")
+                
+            model = self._get_model(self.model_name)
+            
+            # BAAI BGE specific optimization:
+            # BGE models are explicitly trained to expect this prefix on short queries 
+            # when searching against long document passages. It significantly improves accuracy.
+            if "bge" in self.model_name.lower() and "en" in self.model_name.lower():
+                formatted_query = f"Represent this sentence for searching relevant passages: {question.strip()}"
+            else:
+                formatted_query = question.strip()
+                
+            # Encode returns a numpy array, we convert to a standard Python list of floats
+            vector = model.encode(formatted_query, show_progress_bar=False)
+            
+            return vector.tolist()

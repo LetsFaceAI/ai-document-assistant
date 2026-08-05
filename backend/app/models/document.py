@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from app.models.chunk import ChunkingSummary
 
 class PDFMetadataSchema(BaseModel):
+    filename: str | None = None
     title: str | None = None
     author: str | None = None
     subject: str | None = None
