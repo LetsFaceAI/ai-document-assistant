@@ -7,7 +7,7 @@ class ChatService:
 
     async def process_user_message(self, user_message: str) -> str:
         messages = [
-            {"role": "system", "content": "You are a python coding expert."},
+            {"role": "system", "content": "you are smart information bot"},
             {"role": "user", "content": user_message}
         ]
         

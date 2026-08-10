@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     RETRIEVAL_TOP_K: int = 10
     MIN_SIMILARITY_SCORE: float = 0.50
 
+    QUERY_EXPANSION: str = "multi_query"
+    QUERY_EXPANSION_COUNT: int = 4
+    QUERY_FUSION: str = "rrf"
+    RRF_K: int = 60
+
     # Tell pydantic where to find the .env files
     model_config = SettingsConfigDict(
     env_file=BACKEND_DIR / ".env",

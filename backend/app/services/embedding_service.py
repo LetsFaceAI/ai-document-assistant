@@ -96,23 +96,49 @@ class EmbeddingService:
         )
 
     def embed_query(self, question: str) -> List[float]:
-            """
-            Embeds a single user question for vector search.
-            """
-            if not question or not question.strip():
-                raise ValueError("Query cannot be empty")
-                
-            model = self._get_model(self.model_name)
+        """
+        Embeds a single user question for vector search.
+        """
+        if not question or not question.strip():
+            raise ValueError("Query cannot be empty")
             
-            # BAAI BGE specific optimization:
-            # BGE models are explicitly trained to expect this prefix on short queries 
-            # when searching against long document passages. It significantly improves accuracy.
-            if "bge" in self.model_name.lower() and "en" in self.model_name.lower():
-                formatted_query = f"Represent this sentence for searching relevant passages: {question.strip()}"
+        results = self.embed_queries([question])
+        return results[0]
+
+    def embed_queries(self, queries: List[str]) -> List[List[float]]:
+        """
+        Embeds a list of user questions/queries in a single batch for vector search.
+        Applies BAAI BGE query prefix formatting to all queries in the list.
+        """
+        if not queries:
+            return []
+
+        model = self._get_model(self.model_name)
+        is_bge = "bge" in self.model_name.lower() and "en" in self.model_name.lower()
+
+        # Format each query in the batch with the BGE prefix
+        formatted_queries = []
+        for q in queries:
+            clean_q = q.strip() if q else ""
+            if not clean_q:
+                continue
+            
+            if is_bge:
+                formatted_queries.append(
+                    f"Represent this sentence for searching relevant passages: {clean_q}"
+                )
             else:
-                formatted_query = question.strip()
-                
-            # Encode returns a numpy array, we convert to a standard Python list of floats
-            vector = model.encode(formatted_query, show_progress_bar=False)
-            
-            return vector.tolist()
+                formatted_queries.append(clean_q)
+
+        if not formatted_queries:
+            return []
+
+        # Batch encode on CPU for maximum speed
+        vectors = model.encode(
+            formatted_queries,
+            batch_size=32,
+            show_progress_bar=False,
+            normalize_embeddings=True
+        )
+
+        return vectors.tolist()

@@ -19,6 +19,9 @@ class VectorStore(Protocol):
     def search(self, query_embedding: List[float], top_k: int) -> List[RetrievedChunk]:
         ...
 
+    def search_batch(self, query_embeddings: List[List[float]], top_k: int) -> List[List[RetrievedChunk]]:
+        ...
+
     # Abstraction for background data sampling
     def get_background_embeddings(self, limit: int = 1000) -> List[List[float]]:
         ...
@@ -188,3 +191,72 @@ class ChromaVectorStore:
         except Exception as e:
             logger.error(f"Failed to fetch background embeddings: {str(e)}")
             return []
+
+
+    def search_batch(self, query_embeddings: List[List[float]], top_k: int) -> List[List[RetrievedChunk]]:
+        """
+        Executes a single multi-vector search against ChromaDB.
+        
+        Args:
+            query_embeddings: A list of vector lists (one list per expanded query).
+            top_k: Number of candidate chunks to fetch per query.
+            
+        Returns:
+            A list of lists, where result[i] contains the top_k RetrievedChunks for query_embeddings[i].
+        """
+        try:
+            # ChromaDB natively accepts a list of query_embeddings
+            results = self.collection.query(
+                query_embeddings=query_embeddings,
+                n_results=top_k,
+                include=["documents", "metadatas", "distances", "embeddings"]
+            )
+
+            all_query_results: List[List[RetrievedChunk]] = []
+
+            # Chroma returns batched arrays for ids, documents, metadatas, distances, embeddings
+            ids_batch = results.get("ids", [])
+            docs_batch = results.get("documents", [])
+            meta_batch = results.get("metadatas", [])
+            dist_batch = results.get("distances", [])
+            emb_batch = results.get("embeddings", [])
+
+            # Loop through each query's results
+            for q_idx in range(len(query_embeddings)):
+                query_chunks: List[RetrievedChunk] = []
+
+                if q_idx < len(ids_batch) and ids_batch[q_idx]:
+                    ids = ids_batch[q_idx]
+                    documents = docs_batch[q_idx]
+                    metadatas = meta_batch[q_idx]
+                    distances = dist_batch[q_idx]
+                    embeddings = emb_batch[q_idx] if q_idx < len(emb_batch) else []
+
+                    for i in range(len(ids)):
+                        score = 1.0 - distances[i]
+                        meta = metadatas[i] or {}
+
+                        chunk_emb = embeddings[i] if i < len(embeddings) else None
+                        if hasattr(chunk_emb, "tolist"):
+                            chunk_emb = chunk_emb.tolist()
+
+                        chunk = RetrievedChunk(
+                            chunk_id=meta.get("chunk_id", ids[i]),
+                            text=documents[i],
+                            score=score,
+                            document_id=meta.get("document_id", ""),
+                            filename=meta.get("filename", ""),
+                            page_number=meta.get("page_number"),
+                            chunk_index=meta.get("chunk_index", 0),
+                            metadata=meta,
+                            embedding=chunk_emb
+                        )
+                        query_chunks.append(chunk)
+
+                all_query_results.append(query_chunks)
+
+            return all_query_results
+
+        except Exception as e:
+            logger.error(f"Batch search failed: {str(e)}")
+            raise

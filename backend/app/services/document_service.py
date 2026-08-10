@@ -120,7 +120,7 @@ class DocumentService:
             # 5. STATE TRANSITION 1: ProcessedDocument -> ChunkedDocument
             chunked_doc = self.chunker.process(processed_doc)
 
-            # 6. STATE TRANSITION 2: ChunkedDocument -> EmbeddedDocument (NEW!)
+            # 6. STATE TRANSITION 2: ChunkedDocument -> EmbeddedDocument
             embedded_doc = self.embedding_service.process(chunked_doc)
 
             # STATE TRANSITION 3: EmbeddedDocument -> VectorizedDocument
