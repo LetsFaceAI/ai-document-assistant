@@ -38,6 +38,29 @@ class Settings(BaseSettings):
     QUERY_FUSION: str = "rrf"
     RRF_K: int = 60
 
+    # --- Prompt & Context Engineering ---
+    MAX_CONTEXT_TOKENS: int = 2000
+    
+    SYSTEM_PROMPT: str = (
+        "You are an expert AI Document Assistant. Your job is to answer user questions "
+        "accurately based ONLY on the provided context passages.\n\n"
+        "Rules:\n"
+        "1. Strictly base your answer on the provided context passages. Do not invent or extrapolate facts.\n"
+        "2. If the context does not contain enough information to answer the question, clearly state: "
+        "'I cannot answer this based on the provided document context.'\n"
+        "3. Cite your sources inline using the document metadata provided in passage headers "
+        "(e.g., [Doc: filename.pdf, Page: 4]).\n"
+        "4. Keep your response clear, structured, and concise."
+    )
+
+    USER_PROMPT_TEMPLATE: str = (
+        "Below is the relevant document context retrieved for this query:\n\n"
+        "<context>\n"
+        "{formatted_context}\n"
+        "</context>\n\n"
+        "Question: {question}"
+    )
+
     # Tell pydantic where to find the .env files
     model_config = SettingsConfigDict(
     env_file=BACKEND_DIR / ".env",
