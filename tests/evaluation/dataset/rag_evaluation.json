@@ -1,0 +1,482 @@
+[
+{
+"id": 1,
+"question": "What processor core architecture does the PIC32MX family use?",
+"reference_answer": "The PIC32MX family uses the 32-bit MIPS32 M4K CPU core with a 5-stage pipeline.",
+"ref_chunk_index": [6],
+"ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 2,
+"question": "What is the operating voltage range for the PIC32MX microcontrollers?",
+"reference_answer": "The operating voltage range is 2.3V to 3.6V.",
+"ref_chunk_index": [6],
+"ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+    "id": 3,
+    "question": "What email address is provided for submitting documentation errors and feedback?",
+    "reference_answer": "Documentation errors and feedback can be submitted via email to docerrors@microchip.com.",
+    "ref_chunk_index": [27],
+    "ref_chunk_id": ["e15b2b72-0349-4f0c-a423-256c1e249b75"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 4,
+"question": "What is the nominal output frequency of the Fast Internal Oscillator (FRC)?",
+"reference_answer": "The Fast Internal Oscillator (FRC) has a nominal output frequency of 8 MHz.",
+"ref_chunk_index": [35],
+"ref_chunk_id": ["c2560c8c-db93-49b7-8410-1a127ecd76e7"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 5,
+"question": "What is the fixed output frequency of the Internal Low-Power RC oscillator (LPRC)?",
+"reference_answer": "The Internal Low-Power RC oscillator (LPRC) has a fixed output frequency of 31 kHz.",
+"ref_chunk_index": [36],
+"ref_chunk_id": ["61a2e73a-dccd-470a-9bb3-a0942900df66"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 6,
+"question": "What conversion rate is supported by the 10-Bit Analog-to-Digital Converter?",
+"reference_answer": "The 10-Bit Analog-to-Digital Converter supports a conversion rate of 500 ksps.",
+"ref_chunk_index": [7],
+"ref_chunk_id": ["c13c7956-c97b-449b-8afa-d9e319a37d58"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 7,
+"question": "What high-current capability is supported on all I/O pins of the microcontroller?",
+"reference_answer": "All I/O pins support High-Current Sink/Source capability of 18 mA/18 mA.",
+"ref_chunk_index": [8],
+"ref_chunk_id": ["e4f624e4-b7fe-449e-8755-4d30c08e1aeb"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 8,
+"question": "Which Microchip device model is specifically cited as pin-compatible with the PIC32MX Family?",
+"reference_answer": "The PIC32MX Family is pin-compatible with Microchip PIC24FJ128GA010 devices.",
+"ref_chunk_index": [31],
+"ref_chunk_id": ["ab61f983-e7e9-4934-a1bd-bb3317043617"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 9,
+"question": "How many instruction and data hardware break points are available?",
+"reference_answer": "There are 6 instruction hardware break points and 2 data hardware break points.",
+"ref_chunk_index": [38],
+"ref_chunk_id": ["40bbabc5-95e1-49a8-9ab9-ddfefa26f56a"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 10,
+"question": "By how much can MIPS16e Mode reduce code size?",
+"reference_answer": "MIPS16e Mode allows for up to 40% smaller code size.",
+"ref_chunk_index": [6],
+"ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 11,
+"question": "What configuration bit must application code clear to use multiplexed PORTA pins (RA0, RA1, RA4, RA5) for general-purpose I/O on 100-pin devices?",
+"reference_answer": "The application code must clear the JTAGEN bit (DDPCON<3> = 0) to use these pins for general-purpose I/O.",
+"ref_chunk_index": [53],
+"ref_chunk_id": ["390c8629-cb8a-4354-bda8-e069f2481342"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 12,
+"question": "What are the program memory and data memory sizes for the PIC32MX320F032H model?",
+"reference_answer": "The PIC32MX320F032H model features 32 KB of program memory and 8 KB of data memory.",
+"ref_chunk_index": [9],
+"ref_chunk_id": ["db977ad7-5286-49bc-a913-28137aec152f"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 13,
+"question": "What topic is covered in Section 20.0 of the PIC32MX datasheet?",
+"reference_answer": "Section 20.0 covers the Parallel Master Port.",
+"ref_chunk_index": [23],
+"ref_chunk_id": ["d071554a-7e2f-4fdc-8162-ca9457108537"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+    "id": 14,
+    "question": "What standard is the JTAG Boundary Scan compatible with?",
+    "reference_answer": "The JTAG Boundary Scan is compatible with IEEE Std 1149.2.",
+    "ref_chunk_index": [2],
+    "ref_chunk_id": ["c13c7956-c97b-449b-8afa-d9e319a37d58"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 15,
+"question": "What is the size of the Boot Flash Memory provided in addition to main program memory?",
+"reference_answer": "An additional 12 KB of Boot Flash Memory is provided.",
+"ref_chunk_index": [6],
+"ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 16,
+"question": "What two programming and debugging interfaces are provided on the PIC32MX family?",
+"reference_answer": "The two interfaces are a 2-wire interface with unintrusive access and real-time data exchange, and a 4-wire MIPS standard enhanced JTAG interface.",
+"ref_chunk_index": [7],
+"ref_chunk_id": ["c13c7956-c97b-449b-8afa-d9e319a37d58"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 17,
+"question": "What external crystal frequency is the Secondary Oscillator (SOSC) designed to operate with?",
+"reference_answer": "The Secondary Oscillator (SOSC) is designed to operate with an external 32.768 kHz crystal.",
+"ref_chunk_index": [36],
+"ref_chunk_id": ["61a2e73a-dccd-470a-9bb3-a0942900df66"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 18,
+"question": "What is the maximum operating frequency range specified for PIC32MX360F512L in Table 1-1?",
+"reference_answer": "The operating frequency range is DC to 80 MHz.",
+"ref_chunk_index": [37],
+"ref_chunk_id": ["cf005ca1-3c20-4e03-aa63-952a5002c5a8"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 19,
+"question": "Which ISO certification does Microchip hold for the quality system of designing and manufacturing development systems?",
+"reference_answer": "Microchip holds ISO 9001:2000 certification for the design and manufacture of development systems.",
+"ref_chunk_index": [6],
+"ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 20,
+"question": "How can a user identify the version number of a Microchip data sheet?",
+"reference_answer": "The version number is determined by examining the last character of the literature number found on the bottom outside corner of any page.",
+"ref_chunk_index": [28],
+"ref_chunk_id": ["a8cb95a8-bc12-4c4b-9a0e-a6b42518fe8e"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 21,
+"question": "How many 16-bit timers are integrated into the PIC32MX family, and how can they be combined to form 32-bit timers?",
+"reference_answer": "The PIC32MX family includes five 16-bit timers/counters, where two 16-bit pairs can combine to form two 32-bit timers.",
+"ref_chunk_index": [8, 38],
+"ref_chunk_id": ["e4f624e4-b7fe-449e-8755-4d30c08e1aeb", "40bbabc5-95e1-49a8-9ab9-ddfefa26f56a"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 22,
+"question": "How does the Fail-Safe Clock Monitor handle a main clock failure during system operation?",
+"reference_answer": "The Fail-Safe Clock Monitor constantly checks the main clock against a reference signal from the internal oscillator. If the main clock fails, it enables the system to switch to the internal oscillator to maintain low-speed operation or execute a safe shutdown.",
+"ref_chunk_index": [36, 37],
+"ref_chunk_id": ["61a2e73a-dccd-470a-9bb3-a0942900df66", "cf005ca1-3c20-4e03-aa63-952a5002c5a8"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 23,
+"question": "How does implementing the Real-Time Clock/Calendar (RTCC) module in hardware benefit MCU resources?",
+"reference_answer": "By implementing the clock, calendar, and alarm functions directly in hardware, the RTCC module frees up timer resources and program memory space for the core application.",
+"ref_chunk_index": [35],
+"ref_chunk_id": ["c2560c8c-db93-49b7-8410-1a127ecd76e7"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 24,
+"question": "Which facility locations earned Microchip ISO/TS-16949:2002 certification for MCU/DSC manufacturing and design?",
+"reference_answer": "Microchip received ISO/TS-16949:2002 certification for its headquarters, design, and wafer fabrication facilities in Chandler and Tempe, Arizona; Gresham, Oregon; and design centers in California and India.",
+"ref_chunk_index": [5],
+"ref_chunk_id": ["5419f68c-edd2-419f-9ba2-223b3ddca01a"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 25,
+"question": "What execution performance benchmark in DMIPS/MHz does the CPU core achieve, and what hardware acceleration unit supports 32-bit integer math?",
+"reference_answer": "The MIPS32 M4K CPU core achieves up to 1.5 DMIPS/MHz and features a single-cycle multiply and high-performance divide unit for 32-bit integer math execution.",
+"ref_chunk_index": [6, 32],
+"ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d", "69c79e0d-eae9-4d19-ab80-8d17708d871b"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 26,
+"question": "How many UART modules does the PIC32MX family contain, and what built-in hardware encoding standard do they support for serial communications?",
+"reference_answer": "The PIC32MX family contains two independent UART modules that feature built-in hardware encoders and decoders supporting IrDA communications.",
+"ref_chunk_index": [8, 33],
+"ref_chunk_id": ["e4f624e4-b7fe-449e-8755-4d30c08e1aeb", "5a5f1c14-9e96-4509-a9ea-a4188722ec5b"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 27,
+"question": "Does the PIC32MX microcontroller feature an integrated Ethernet MAC controller?",
+"reference_answer": "No, an integrated Ethernet MAC controller is not supported or listed among the peripheral features of the PIC32MX family.",
+"ref_chunk_index": [8, 33],
+"ref_chunk_id": ["e4f624e4-b7fe-449e-8755-4d30c08e1aeb", "5a5f1c14-9e96-4509-a9ea-a4188722ec5b"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 28,
+"question": "Does the PIC32MX family support Wi-Fi wireless networking on-chip?",
+"reference_answer": "No, the document does not list Wi-Fi wireless networking as a feature supported by the PIC32MX family.",
+"ref_chunk_index": [8, 33],
+"ref_chunk_id": ["e4f624e4-b7fe-449e-8755-4d30c08e1aeb", "5a5f1c14-9e96-4509-a9ea-a4188722ec5b"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 29,
+"question": "Is the CPU architecture of the PIC32MX family 64-bit?",
+"reference_answer": "No, the CPU core is a 32-bit RISC architecture (MIPS32 M4K) and is not 64-bit.",
+"ref_chunk_index": [6, 32],
+"ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d", "69c79e0d-eae9-4d19-ab80-8d17708d871b"],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+"id": 30,
+"question": "What is the unit purchase price for the PIC32MX360F512L microcontroller?",
+"reference_answer": "Information regarding the unit purchase price of the PIC32MX360F512L is not provided in the document.",
+"ref_chunk_index": [],
+"ref_chunk_id": [],
+"reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+},
+{
+    "id": 31,
+    "question": "What year was the advance information data sheet copyrighted?",
+    "reference_answer": "The advance information data sheet was copyrighted in 2008[cite: 3].",
+    "ref_chunk_index": [0],
+    "ref_chunk_id": ["790179d1-f051-4b71-a50b-9befe0c3a84a"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 32,
+    "question": "What ISO certification did Microchip receive for its worldwide headquarters?",
+    "reference_answer": "Microchip received ISO/TS-16949:2002 certification for its worldwide headquarters[cite: 3].",
+    "ref_chunk_index": [5],
+    "ref_chunk_id": ["5419f68c-edd2-419f-9ba2-223b3ddca01a"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 33,
+    "question": "What is the operating voltage range for the PIC32MX family?",
+    "reference_answer": "The operating voltage range is 2.3V to 3.6V[cite: 3].",
+    "ref_chunk_index": [6],
+    "ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 34,
+    "question": "What core is used in the PIC32MX FAMILY High-Performance RISC CPU?",
+    "reference_answer": "It uses a MIPS32 M4K 32-Bit Core with a 5-Stage Pipeline[cite: 3].",
+    "ref_chunk_index": [6],
+    "ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 35,
+    "question": "Which mode enables up to 40% smaller code size?",
+    "reference_answer": "The MIPS16e Mode allows for up to 40% smaller code size[cite: 3].",
+    "ref_chunk_index": [6],
+    "ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 36,
+    "question": "How much additional boot flash memory is included?",
+    "reference_answer": "There is an additional 12 KB of Boot Flash Memory[cite: 3].",
+    "ref_chunk_index": [6],
+    "ref_chunk_id": ["1a507734-a7f1-4463-bd20-40836f90890d"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 37,
+    "question": "What is the conversion rate of the 10-Bit Analog-to-Digital Converter?",
+    "reference_answer": "The conversion rate is 500 ksps[cite: 3].",
+    "ref_chunk_index": [7],
+    "ref_chunk_id": ["c13c7956-c97b-449b-8afa-d9e319a37d58"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 38,
+    "question": "What USB standards is the PIC32MX compliant with?",
+    "reference_answer": "It is compliant with USB 1.1 & 2.0 Full Speed Device and On The Go (OTG) controller[cite: 3].",
+    "ref_chunk_index": [8],
+    "ref_chunk_id": ["e4f624e4-b7fe-449e-8755-4d30c08e1aeb"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 39,
+    "question": "What do the two UART modules support?",
+    "reference_answer": "They support RS-232, RS-485, LIN 1.2, and IrDA with an on-chip hardware encoder and decoder[cite: 3].",
+    "ref_chunk_index": [8],
+    "ref_chunk_id": ["e4f624e4-b7fe-449e-8755-4d30c08e1aeb"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 40,
+    "question": "What is the high-current sink/source rating on all I/O pins?",
+    "reference_answer": "The high-current sink/source rating is 18 mA/18 mA[cite: 3].",
+    "ref_chunk_index": [8],
+    "ref_chunk_id": ["e4f624e4-b7fe-449e-8755-4d30c08e1aeb"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 41,
+    "question": "Are the digital input pins on the PIC32MX family 5.5V tolerant?",
+    "reference_answer": "Yes, the digital input pins only are 5.5V tolerant[cite: 3].",
+    "ref_chunk_index": [9],
+    "ref_chunk_id": ["db977ad7-5286-49bc-a913-28137aec152f"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 42,
+    "question": "How much Program Memory does the PIC32MX320F128H have?",
+    "reference_answer": "The PIC32MX320F128H has 128 KB of Program Memory[cite: 3].",
+    "ref_chunk_index": [9],
+    "ref_chunk_id": ["db977ad7-5286-49bc-a913-28137aec152f"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 43,
+    "question": "What is the email address to contact regarding publication errors or comments?",
+    "reference_answer": "The email address is docerrors@microchip.com[cite: 3].",
+    "ref_chunk_index": [27],
+    "ref_chunk_id": ["e15b2b72-0349-4f0c-a423-256c1e249b75"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 44,
+    "question": "What is the fax number for the Reader Response Form?",
+    "reference_answer": "The fax number is (480) 792-4150[cite: 3].",
+    "ref_chunk_index": [27],
+    "ref_chunk_id": ["e15b2b72-0349-4f0c-a423-256c1e249b75"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 45,
+    "question": "How can a user determine the version of a data sheet?",
+    "reference_answer": "The version can be determined by the last character of the literature number found on the bottom outside corner of any page[cite: 3].",
+    "ref_chunk_index": [28],
+    "ref_chunk_id": ["a8cb95a8-bc12-4c4b-9a0e-a6b42518fe8e"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 46,
+    "question": "Which Microchip devices is the PIC32MX Family pin compatible with?",
+    "reference_answer": "The PIC32MX Family is pin compatible with Microchip PIC24FJ128GA010 devices[cite: 3].",
+    "ref_chunk_index": [31],
+    "ref_chunk_id": ["ab61f983-e7e9-4934-a1bd-bb3317043617"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 47,
+    "question": "What is the maximum DMIPS/MHz offered by the 32-bit MIPS32 M4K CPU core?",
+    "reference_answer": "It offers up to 1.5 DMIPS/MHz[cite: 3].",
+    "ref_chunk_index": [32],
+    "ref_chunk_id": ["69c79e0d-eae9-4d19-ab80-8d17708d871b"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 48,
+    "question": "What feature allows the device clock to be changed under software control during operation?",
+    "reference_answer": "On-the-Fly Clock Switching allows the clock to be changed to any of the four clock sources[cite: 3].",
+    "ref_chunk_index": [33],
+    "ref_chunk_id": ["5a5f1c14-9e96-4509-a9ea-a4188722ec5b"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 49,
+    "question": "How many independent UARTs are equipped on all PIC32MX devices?",
+    "reference_answer": "All devices are equipped with two independent UARTs[cite: 3].",
+    "ref_chunk_index": [33],
+    "ref_chunk_id": ["5a5f1c14-9e96-4509-a9ea-a4188722ec5b"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 50,
+    "question": "What are the user-selectable A/D trigger sources?",
+    "reference_answer": "The user-selectable A/D trigger sources are timer event, external pin, manual, and auto-convert[cite: 3].",
+    "ref_chunk_index": [34],
+    "ref_chunk_id": ["a6e7522c-a71b-4e16-ae5a-f095d8183ef5"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 51,
+    "question": "What is the nominal output of the Fast Internal Oscillator (FRC)?",
+    "reference_answer": "The Fast Internal Oscillator (FRC) has a nominal 8 MHz output[cite: 3].",
+    "ref_chunk_index": [35],
+    "ref_chunk_id": ["c2560c8c-db93-49b7-8410-1a127ecd76e7"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 52,
+    "question": "What is the clock speed range provided by the on-board postscalers and/or PLL?",
+    "reference_answer": "The clock speeds range from 31 kHz to the maximum specified frequency[cite: 3].",
+    "ref_chunk_index": [36],
+    "ref_chunk_id": ["61a2e73a-dccd-470a-9bb3-a0942900df66"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 53,
+    "question": "What is the fixed output frequency of the Internal Low-Power RC oscillator (LPRC)?",
+    "reference_answer": "The LPRC has a fixed 31 kHz output[cite: 3].",
+    "ref_chunk_index": [36],
+    "ref_chunk_id": ["61a2e73a-dccd-470a-9bb3-a0942900df66"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 54,
+    "question": "What is the operating frequency of the PIC32MX320F032H?",
+    "reference_answer": "The operating frequency is DC - 40 MHz[cite: 3].",
+    "ref_chunk_index": [37],
+    "ref_chunk_id": ["cf005ca1-3c20-4e03-aa63-952a5002c5a8"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 55,
+    "question": "What is the data memory capacity of the PIC32MX320F032H device?",
+    "reference_answer": "The data memory capacity is 8K bytes[cite: 3].",
+    "ref_chunk_index": [37],
+    "ref_chunk_id": ["cf005ca1-3c20-4e03-aa63-952a5002c5a8"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 56,
+    "question": "How many hardware breakpoints are available on the PIC32MX3XXFXXX General Purpose family?",
+    "reference_answer": "There are 6 instruction breakpoints and 2 data breakpoints[cite: 3].",
+    "ref_chunk_index": [38],
+    "ref_chunk_id": ["40bbabc5-95e1-49a8-9ab9-ddfefa26f56a"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 57,
+    "question": "What is the operating frequency for the PIC32MX4XXFXXX USB Family devices?",
+    "reference_answer": "The operating frequency is DC - 80 MHz[cite: 3].",
+    "ref_chunk_index": [39],
+    "ref_chunk_id": ["d06f6fdd-91e3-4714-98dd-c6b25a349d82"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 58,
+    "question": "Is PORTA present on 64-pin devices?",
+    "reference_answer": "No, PORTA is not present on 64-pin devices[cite: 3].",
+    "ref_chunk_index": [41],
+    "ref_chunk_id": ["bfe97629-3039-43c7-ba34-1332f2ef05e2"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 59,
+    "question": "What is the function of the AVDD pin?",
+    "reference_answer": "It is the Positive Supply for Analog Modules[cite: 3].",
+    "ref_chunk_index": [45],
+    "ref_chunk_id": ["f0c79500-15d5-4bce-94cf-9a9da57b574f"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  },
+  {
+    "id": 60,
+    "question": "What is the function of the MCLR pin and how is a Reset triggered using it?",
+    "reference_answer": "The MCLR pin is the Master Clear (Device Reset) Input, and bringing this line low causes a Reset[cite: 3].",
+    "ref_chunk_index": [47],
+    "ref_chunk_id": ["e8244d81-844d-4242-99ca-07b8bcb1e65c"],
+    "reference_document": "PIC32MX_Datasheet_v2_61143B.pdf"
+  }
+]

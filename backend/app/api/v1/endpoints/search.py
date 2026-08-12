@@ -72,21 +72,21 @@ async def search_documents(
         )
 
         # Collect chunk vectors for background UMAP plot
-        final_chunk_vectors = [
-            c.embedding
-            for c in retrieval_result.retrieved_chunks
-            if getattr(c, "embedding", None) is not None
-        ]
+        # final_chunk_vectors = [
+        #     c.embedding
+        #     for c in retrieval_result.retrieved_chunks
+        #     if getattr(c, "embedding", None) is not None
+        # ]
 
-        # Schedule background visualization
-        background_tasks.add_task(
-            generate_plot_background,
-            viz_service=viz_service,
-            vector_store=vector_store,
-            query_embedding=original_query_vec,
-            retrieved_embeddings=final_chunk_vectors,
-            question=request.question,
-        )
+        # # Schedule background visualization
+        # background_tasks.add_task(
+        #     generate_plot_background,
+        #     viz_service=viz_service,
+        #     vector_store=vector_store,
+        #     query_embedding=original_query_vec,
+        #     retrieved_embeddings=final_chunk_vectors,
+        #     question=request.question,
+        # )
 
         return retrieval_result
 
