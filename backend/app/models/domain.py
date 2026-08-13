@@ -75,3 +75,4 @@ class RetrievalResult(BaseModel):
     retrieved_chunks: List[RetrievedChunk]
     retrieval_time_ms: float
     embedding_model: str
+    debug_image: Optional[str] = None

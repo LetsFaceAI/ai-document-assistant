@@ -5,6 +5,7 @@ and schedules background UMAP plotting.
 """
 
 import logging
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel
 
@@ -31,6 +32,7 @@ def generate_plot_background(
     query_embedding: list[float],
     retrieved_embeddings: list[list[float]],
     question: str,
+    filename: str,  # <--- NEW PARAMETER
 ):
     """Generates the UMAP evaluation plot in storage/debug/ without slowing down the API."""
     try:
@@ -40,6 +42,7 @@ def generate_plot_background(
             retrieved_embeddings=retrieved_embeddings,
             background_embeddings=background_embeddings,
             query_text=question,
+            filename=filename,  # <--- PASS FILENAME TO SERVICE
         )
     except Exception as e:
         logger.error(f"Background UMAP plot generation failed: {str(e)}")
@@ -72,21 +75,29 @@ async def search_documents(
         )
 
         # Collect chunk vectors for background UMAP plot
-        # final_chunk_vectors = [
-        #     c.embedding
-        #     for c in retrieval_result.retrieved_chunks
-        #     if getattr(c, "embedding", None) is not None
-        # ]
+        final_chunk_vectors = [
+            c.embedding
+            for c in retrieval_result.retrieved_chunks
+            if getattr(c, "embedding", None) is not None
+        ]
 
-        # # Schedule background visualization
-        # background_tasks.add_task(
-        #     generate_plot_background,
-        #     viz_service=viz_service,
-        #     vector_store=vector_store,
-        #     query_embedding=original_query_vec,
-        #     retrieved_embeddings=final_chunk_vectors,
-        #     question=request.question,
-        # )
+        # 1. Pre-generate the filename for the UMAP image
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        debug_filename = f"umap_query_{timestamp}.png"
+
+        # 2. Schedule background visualization with pre-generated filename
+        background_tasks.add_task(
+            generate_plot_background,
+            viz_service=viz_service,
+            vector_store=vector_store,
+            query_embedding=original_query_vec,
+            retrieved_embeddings=final_chunk_vectors,
+            question=request.question,
+            filename=debug_filename,  # <--- PASS FILENAME HERE
+        )
+
+        # 3. Attach the filename to the response model so React receives it
+        retrieval_result.debug_image = debug_filename
 
         return retrieval_result
 

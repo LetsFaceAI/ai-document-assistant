@@ -1,12 +1,19 @@
-import umap
-import numpy as np
-import matplotlib.pyplot as plt
-from pathlib import Path
-from datetime import datetime
-from typing import List
+"""
+File: backend/app/services/visualization_service.py
+Description: Service for rendering UMAP embeddings visualizations and saving debug plots.
+"""
+
 import logging
+from datetime import datetime
+from pathlib import Path
+from typing import List, Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
+import umap
 
 logger = logging.getLogger(__name__)
+
 
 class VisualizationService:
     def __init__(self, debug_dir: str = "storage/debug"):
@@ -18,7 +25,8 @@ class VisualizationService:
         query_embedding: List[float], 
         retrieved_embeddings: List[List[float]], 
         background_embeddings: List[List[float]],
-        query_text: str = "Query"
+        query_text: str = "Query",
+        filename: Optional[str] = None  # <--- NEW PARAMETER
     ) -> str:
         
         # 1. Logging & Diagnostics
@@ -35,7 +43,7 @@ class VisualizationService:
         dataset_arr = np.array(background_embeddings)
         query_arr = np.array([query_embedding])
 
-        # 3. Fit UMAP on the overall vector database (Tutorial Strategy)
+        # 3. Fit UMAP on the overall vector database
         n_neighbors = min(15, len(background_embeddings) - 1)
         reducer = umap.UMAP(
             n_neighbors=n_neighbors,
@@ -80,9 +88,11 @@ class VisualizationService:
         plt.legend(loc='best')
         plt.grid(True, linestyle='--', alpha=0.3)
 
-        # Save Plot
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"umap_query_{timestamp}.png"
+        # 6. Save Plot with pre-determined filename (or fallback timestamp)
+        if not filename:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"umap_query_{timestamp}.png"
+            
         filepath = self.debug_dir / filename
 
         plt.savefig(filepath, dpi=300, bbox_inches='tight')
